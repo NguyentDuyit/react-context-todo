@@ -1,6 +1,6 @@
 export const initState = {
     todos: [],
-    fakeTodosCompleted: [],
+    cloneTodosCompleted: [],
     todosCompleted: []
 }
 
@@ -15,6 +15,12 @@ export const _deleteItem = (todoId) => {
     return {
         type: "DELETE_TODO_ITEM",
         payload: todoId
+    }
+}
+
+export const _clearItemTodoCompleted = () => {
+    return {
+        type: "CLEAR_TODO_COMPLETED"
     }
 }
 
@@ -55,29 +61,36 @@ export function reducer(state = initState, { type, payload }) {
         case "DELETE_ALL_ITEMS":
             return {
                 ...state,
-                todos: []
+                todos: [],
+                todosCompleted: []
+            }
+
+        case "CLEAR_TODO_COMPLETED":
+            return {
+                ...state,
+                todosCompleted: []
             }
 
         case "DELETE_TODO_ITEM":
             const cloneTodosCompletedTag = JSON.parse(JSON.stringify(state.todos))
             const indexOfCompletedTag = cloneTodosCompletedTag.findIndex(item => item.id == payload)
-            cloneTodosCompletedTag[indexOfCompletedTag].checked = !cloneTodosCompletedTag[indexOfCompletedTag].checked
+            cloneTodosCompletedTag[indexOfCompletedTag].checked = false
             return {
                 ...state,
                 todos: cloneTodosCompletedTag,
                 todosCompleted: state.todosCompleted.filter(item => item.id !== payload),
-                fakeTodosCompleted: state.todosCompleted
+                cloneTodosCompleted: state.todosCompleted
             }
 
         case "TODO_COMPLETED":
             const cloneTodos = JSON.parse(JSON.stringify(state.todos))
             const indexOf = cloneTodos.findIndex(item => item.id == payload)
-            cloneTodos[indexOf].checked = !cloneTodos[indexOf].checked
+            cloneTodos[indexOf].checked = true
             return {
                 ...state,
                 todos: cloneTodos,
                 todosCompleted: [...state.todosCompleted, cloneTodos[indexOf]],
-                fakeTodosCompleted: state.todosCompleted
+                cloneTodosCompleted: state.todosCompleted
             }
 
         case "TOGGLE_STATUS_TODO":
@@ -88,14 +101,13 @@ export function reducer(state = initState, { type, payload }) {
                 ...state,
                 todos: cloneTodosToggle,
                 todosCompleted: state.todosCompleted.filter(item => item.id !== payload),
-                fakeTodosCompleted: state.todosCompleted
+                cloneTodosCompleted: state.todosCompleted
             }
 
         case "SEARCH_TODO_ITEM":
-            console.log(state.fakeTodosCompleted)
             return {
                 ...state,
-                todosCompleted: state.fakeTodosCompleted.filter(item => item.title.toLowerCase().includes(payload))
+                cloneTodosCompleted: state.todosCompleted.filter(item => item.title.toLowerCase().includes(payload))
             }
     }
 }

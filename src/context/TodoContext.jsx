@@ -7,17 +7,24 @@ import {
     _getTodoCompleted,
     _toggleStatusTodo,
     _deleteItem,
-    _searchTodoItem
+    _searchTodoItem,
+    _clearItemTodoCompleted
 } from "../reducer/stateReducer";
 
 const TodoContext = createContext()
 export const TodoProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initState)
+    const [isSearching, setIsSearching] = useState("")
     const checkLocalTodos = JSON.parse(localStorage.getItem("listItems"))
     const checkLocalTodosCompleted = JSON.parse(localStorage.getItem("listItemsCompleted"))
+
     function searchTodoItem(keyword) {
-        console.log(keyword)
+        setIsSearching(keyword)
         dispatch(_searchTodoItem(keyword))
+    }
+
+    function clearItemTodoCompleted() {
+        dispatch(_clearItemTodoCompleted())
     }
 
     function getTodoItem(todoItem) {
@@ -29,8 +36,9 @@ export const TodoProvider = ({ children }) => {
     }
 
     function deleteAllItems() {
+        dispatch(_deleteAllItems())
+        localStorage.removeItem("listItemsCompleted")
         localStorage.removeItem("listItems")
-        dispatch(_deleteAllItems)
     }
 
     function getTodoCompleted(id) {
@@ -38,13 +46,20 @@ export const TodoProvider = ({ children }) => {
     }
 
     function toggleStatusTodo(id) {
-        dispatch(_toggleStatusTodo(id))
+        if (state.todosCompleted.length == 1) {
+            dispatch(_toggleStatusTodo(id))
+            localStorage.removeItem("listItemsCompleted")
+            dispatch(_clearItemTodoCompleted())
+        } else {
+            dispatch(_toggleStatusTodo(id))
+        }
     }
 
     useEffect(() => {
         if (state.todos.length > 0) {
             localStorage.setItem("listItems", JSON.stringify(state.todos))
         } else {
+            const checkLocalTodos = JSON.parse(localStorage.getItem("listItems"))
             if (checkLocalTodos) {
                 state.todos = checkLocalTodos
             }
@@ -69,7 +84,9 @@ export const TodoProvider = ({ children }) => {
                 toggleStatusTodo,
                 checkLocalTodosCompleted,
                 deleteItem,
-                searchTodoItem
+                searchTodoItem,
+                clearItemTodoCompleted,
+                isSearching
             }}
         >
             {children}

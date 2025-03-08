@@ -4,7 +4,7 @@ import '@ant-design/v5-patch-for-react-19';
 import TodoInput from './components/Todo/TodoInput';
 import DeleteAll from './components/Button/DeleteAll';
 import TodoListCompleted from './components/Todo/TodoListCompleted';
-import TodoInputSearch from './components/Todo/TodoInputSearch';
+import TodoSearchCompleted from './components/Todo/TodoSearchCompleted';
 function App() {
   const { Text } = Typography;
   const items = [
@@ -33,7 +33,7 @@ function App() {
       children: (
         <>
           <Flex gap="small">
-            <TodoInputSearch />
+            <TodoSearchCompleted />
           </Flex>
           <br />
           <Flex vertical="column">
